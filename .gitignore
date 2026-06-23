@@ -1,0 +1,26 @@
+# Dependency directories
+node_modules/
+
+# Local env files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Production builds
+dist/
+build/
+
+# Uploads
+backend/uploads/*
+!backend/uploads/.gitkeep
+
+# IDE files
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
