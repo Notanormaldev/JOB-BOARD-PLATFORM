@@ -33,11 +33,9 @@ const Navbar = () => {
         <div className="flex justify-between h-16">
           {/* Logo & Main Nav */}
           <div className="flex items-center">
-            <Link to="/" className="flex items-center space-x-2 text-primary font-bold text-xl">
-              <div className="bg-primary text-white p-1.5 rounded">
-                <Briefcase size={20} />
-              </div>
-              <span className="tracking-tight">HireHub</span>
+            <Link to="/" className="flex items-center space-x-2.5 text-primary font-bold text-xl">
+              <img src="/favicon.svg" className="h-8 w-8 rounded" alt="HireHub Logo" />
+              <span className="tracking-tight font-extrabold text-slate-900 text-lg">HireHub</span>
             </Link>
             
             <div className="hidden md:flex ml-8 space-x-1">
