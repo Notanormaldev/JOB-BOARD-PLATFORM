@@ -146,4 +146,67 @@ router.put('/me', protect, async (req, res) => {
   }
 });
 
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
+
+const uploadDir = path.join(__dirname, '../uploads');
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, uploadDir);
+  },
+  filename: function (req, file, cb) {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
+  }
+});
+
+const upload = multer({
+  storage: storage,
+  fileFilter: function (req, file, cb) {
+    const ext = path.extname(file.originalname).toLowerCase();
+    if (ext !== '.pdf' && ext !== '.doc' && ext !== '.docx') {
+      return cb(new Error('Only PDFs and Word documents are allowed'), false);
+    }
+    cb(null, true);
+  },
+  limits: { fileSize: 10 * 1024 * 1024 }
+});
+
+// @route   POST /api/auth/resume
+// @desc    Upload profile resume
+// @access  Private (Candidate)
+router.post('/resume', protect, (req, res) => {
+  upload.single('resume')(req, res, async function (err) {
+    if (err) {
+      return res.status(400).json({ message: err.message });
+    }
+
+    if (!req.file) {
+      return res.status(400).json({ message: 'Please upload a resume file' });
+    }
+
+    try {
+      const user = await User.findById(req.user._id);
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+
+      user.candidateProfile.resumeUrl = `/uploads/${req.file.filename}`;
+      const updatedUser = await user.save();
+      
+      const userResponse = updatedUser.toObject();
+      delete userResponse.password;
+      res.json(userResponse);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Server error' });
+    }
+  });
+});
+
 module.exports = router;
